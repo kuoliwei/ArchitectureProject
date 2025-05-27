@@ -2,30 +2,25 @@ name: Build Unity Project
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
-  build:
+  buildWindows:
     name: Build for Windows
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache Library
-        uses: actions/cache@v3
-        with:
-          path: Library
-          key: Library-${{ hashFiles('**/Assets/**', '**/Packages/**', '**/ProjectSettings/**') }}
-          restore-keys: |
-            Library-
-
-      - name: Build project
-        uses: game-ci/unity-builder@v2
-        with:
-          unityVersion: 2022.3.5f1
-          targetPlatform: StandaloneWindows64
+      # 新增：啟用 Unity License（Unity Personal 帳號登入）
+      - name: Activate Unity
+        uses: game-ci/unity-activate@v2
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+      - name: Build for Windows
+        uses: game-ci/unity-builder@v2
+        with:
+          targetPlatform: StandaloneWindows64
